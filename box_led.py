@@ -38,13 +38,9 @@ def create_double_wall_box(box_dimentions):
             (0, fold_margin),
             (-(height-thickness), 0),
             (-wing, 2*fold_margin),
-            (0, depth - 2*(2*fold_margin + fold_margin)),
-            (wing, 2*fold_margin),
-            (height-thickness, 0),
-            (0, fold_margin),
-            (height, 0)
-        ]),
-        layer=CutLayer
+            (0, (depth - 2*(2*fold_margin + fold_margin))/2),  # <---
+        ], mirror=(-1, 1)),
+        layer=CutLayer,
     )
 
     w_wing_wall = Shape (
@@ -58,18 +54,8 @@ def create_double_wall_box(box_dimentions):
             (fold_margin, 0),
             (0, height - thickness),
             (2*fold_margin, wing),
-            (width - 2*(thickness+3*fold_margin), 0),  # <----
-            (2*fold_margin, -wing),
-            (0, -(height - thickness)),
-            (fold_margin, 0),
-
-            (0, -fold_margin),
-            (internal_wing, 0),
-            (0, -(height - 2*fold_margin)),
-            (-internal_wing, 0),
-            (0, -fold_margin)
-
-        ]),
+            ((width - 2*(thickness+3*fold_margin))/2, 0),  # <----
+        ], mirror=(1, -1)),
         layer=CutLayer
     )
 
@@ -81,14 +67,19 @@ def create_double_wall_box(box_dimentions):
     w_wall.align_to(bottom, position='left-down', move=(thickness, 0), scale=(1, -1))
     shapes.add_shape(w_wall)
 
-    shapes.add_shape(d_wall)
+    dw1 = shapes.add_shape(d_wall)
+    dw2 = shapes.add_shape(d_wall.align_to(bottom, position='right-down', scale=(-1, 1)))
 
-    shapes.add_shape(d_wall.align_to(bottom, position='right-down', scale=(-1, 1)))
+    ww1 = shapes.add_shape(w_wing_wall.align_to(bottom, position='left-up', move=(thickness, 0)))
+    ww2 = shapes.add_shape(w_wing_wall.align_to(bottom, position='left-down', move=(thickness, 0), scale=(1, -1)))
 
-    shapes.add_shape(w_wing_wall.align_to(bottom, position='left-up', move=(thickness, 0)))
+    # Create internal score lines
+    for x in (dw1, dw2):
+        shapes.add_shape(x.create_internal_line(2, layer=ScoreLayer))
+        shapes.add_shape(x.create_internal_line(3, layer=ScoreLayer))
 
-    #shapes.add_shape(w_wall.align_to(bottom, position='left-up', move=(thickness, 0)))
-
+    for x in (ww1, ww2):
+        shapes.add_shape(x.create_internal_line(7, layer=ScoreLayer))
 
     return shapes
 

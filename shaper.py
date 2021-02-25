@@ -1,15 +1,24 @@
 import copy
 
 
-def RelPoints(points, start=(0, 0)):
+def RelPoints(points, start=(0, 0), mirror=None):
     ret = []
     prv = start
+
+    temp_points = list(points)
+
+    if mirror:
+        mr_x, mr_y = mirror
+        for x, y in points[::-1]:
+            temp_points.append((x*mr_x, y*mr_y))
+
     ret.append(prv)
-    for x, y in points:
+    for x, y in temp_points:
         p_x, p_y = prv
         new_point = (x+p_x, y+p_y)
         ret.append(new_point)
         prv = new_point
+
     return ret
 
 
@@ -78,6 +87,16 @@ class Shape:
             ret.append((prv_point, self.calc_points[0]))
 
         return ret
+
+    def create_internal_line(self, point_index1, point_index2=None, **kwargs):
+        p1 = self.calc_points[point_index1]
+
+        if point_index2 is None:
+            p2 = self.calc_points[-1-point_index1]
+        else:
+            p2 = self.calc_points[point_index2]
+
+        return Shape((p1, p2), **kwargs)
 
 
 class ShapeArray:
