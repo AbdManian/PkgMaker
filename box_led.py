@@ -83,8 +83,28 @@ def create_double_wall_box(box_dimensions):
     return shapes
 
 
+def create_box_with_led(box_dimensions):
+    """
+    width, height, depth, led_height,
+    thickness, fold_margin, wing_width
+    """
+
+    t = box_dimensions['thickness']
+
+    body_d = dict(box_dimensions)
+    led_d = dict(box_dimensions)
+
+    led_d['width'] = body_d['width'] + 4*t
+    led_d['depth'] = body_d['depth'] + 4*t
+    led_d['height'] = box_dimensions['led_height']
+
+    return create_double_wall_box(body_d), create_double_wall_box(led_d)
+
+
 if __name__ == '__main__':
-    dimensions = dict(height=50, width=135, depth=45, thickness=0.7, fold_margin=2, wing_width=10)
-    shapes = create_double_wall_box(dimensions)
-    write_shapes_to_file('sample.dxf', shapes)
+    dimensions = dict(height=50, width=135, depth=45, led_height=20, thickness=0.7, fold_margin=2, wing_width=10)
+    body, led = create_box_with_led(dimensions)
+    write_shapes_to_file('body.dxf', body)
+    write_shapes_to_file('led.dxf', led)
+
 
