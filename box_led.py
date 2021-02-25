@@ -2,21 +2,20 @@ from shaper import ShapeArray, Shape, RelPoints
 from drawshapes import write_shapes_to_file, CutLayer, ScoreLayer
 
 
-def create_double_wall_box(box_dimentions):
+def create_double_wall_box(box_dimensions):
     """
     width, depth, height, thickness,
     fold_margin, wing_width
 
-    :param box_dimention:
-    :return:
+    returns ShapeArray
     """
 
-    width = box_dimentions['width']
-    height = box_dimentions['height']
-    depth = box_dimentions['depth']
-    thickness = box_dimentions['thickness']
-    fold_margin = box_dimentions['fold_margin']
-    wing = box_dimentions['wing_width']
+    width = box_dimensions['width']
+    height = box_dimensions['height']
+    depth = box_dimensions['depth']
+    thickness = box_dimensions['thickness']
+    fold_margin = box_dimensions['fold_margin']
+    wing = box_dimensions['wing_width']
 
     internal_wing = depth / 2 - 2*fold_margin
 
@@ -85,7 +84,7 @@ def create_double_wall_box(box_dimentions):
 
 
 if __name__ == '__main__':
-    dimentions = dict(height=50, width=135, depth=45, thickness=0.7, fold_margin=2, wing_width=10)
-    shapes = create_double_wall_box(dimentions)
+    dimensions = dict(height=50, width=135, depth=45, thickness=0.7, fold_margin=2, wing_width=10)
+    shapes = create_double_wall_box(dimensions)
     write_shapes_to_file('sample.dxf', shapes)
 
