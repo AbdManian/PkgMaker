@@ -1,3 +1,18 @@
+import copy
+
+
+def RelPoints(points, start=(0, 0)):
+    ret = []
+    prv = start
+    ret.append(prv)
+    for x, y in points:
+        p_x, p_y = prv
+        new_point = (x+p_x, y+p_y)
+        ret.append(new_point)
+        prv = new_point
+    return ret
+
+
 class Shape:
     def __init__(self, points, closed=False, scale=(1, 1), move=(0, 0), layer=0):
         self.points = points
@@ -34,7 +49,6 @@ class Shape:
 
         x_center = (x_min + x_max)/2
         y_center = (y_min + y_max)/2
-
         x_selector = dict(left=x_min, center=x_center, right=x_max)
         y_selector = dict(up=y_max, center=y_center, down=y_min)
         return x_selector[anchor_x], y_selector[anchor_y]
@@ -43,8 +57,15 @@ class Shape:
         self.move = new_position
         self.calc_points = self.calc_absolute_points()
 
-    def align_to(self, reference, position="center-center"):
+    def align_to(self, reference, position="center-center", move=(0, 0), scale=(1, 1)):
+        self.scale = scale
         self.move_to(reference.get_anchor(position))
+        self.relative_move(move)
+        return self
+
+    def relative_move(self, move):
+        mx, my = move
+        self.calc_points = [(p_x + mx, p_y + my) for p_x, p_y in self.calc_points]
 
     def get_lines(self):
         ret = []
@@ -63,7 +84,12 @@ class ShapeArray:
     def __init__(self):
         self.shapes = []
 
-    def add(self, *args, **kwargs):
+    def add_lines(self, *args, **kwargs):
         x = Shape(*args, **kwargs)
         self.shapes.append(x)
         return x
+
+    def add_shape(self, shape):
+        n_shape = copy.deepcopy(shape)
+        self.shapes.append(n_shape)
+        return n_shape

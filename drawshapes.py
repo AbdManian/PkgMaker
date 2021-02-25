@@ -1,6 +1,9 @@
 import ezdxf
 import collections
 
+CutLayer = 1
+ScoreLayer = 0
+
 
 def drawshapes(shapes, model_space, layer_dict):
     for shape in shapes.shapes:
