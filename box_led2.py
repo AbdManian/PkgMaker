@@ -16,7 +16,7 @@ def create_double_wall_box(box_dimensions):
     thickness = box_dimensions['thickness']
     fold_margin = box_dimensions['fold_margin']
     wing = box_dimensions['wing_width']
-
+    wing_slope = fold_margin * 2
     internal_wing = depth / 2 - 2*fold_margin
 
     shapes = ShapeArray()
@@ -31,34 +31,40 @@ def create_double_wall_box(box_dimensions):
         layer=ScoreLayer
     )
 
-    d_wall = Shape(
+    outer_cut_left = Shape(
         RelPoints([
-            (-height, 0),
-            (0, fold_margin),
-            (-(height-thickness), 0),
-            (-wing, 2*fold_margin),
-            (0, (depth - 2*(2*fold_margin + fold_margin))/2),  # <---
-        ], mirror=(-1, 1)),
+            (-(width / 2 - thickness - wing_slope), 0),
+            (-wing_slope, wing),
+            (0, height - thickness),
+            (-(internal_wing + thickness), 0),
+            (0, height),
+            (internal_wing, 0),
+            (-(2 * height - thickness), 0),
+            (-wing, wing_slope),
+            (0, depth - 2 * wing_slope),  # <--
+            (wing, wing_slope),
+            ((2 * height - thickness), 0),
+            (-internal_wing, 0),
+            (0, height ),
+            ((internal_wing + thickness), 0),
+            (0, height - thickness),
+            (wing_slope, wing),
+            ((width / 2 - thickness - wing_slope), 0),
+
+        ], mirror=(1, -1)),
+        move=(width / 2, -(height * 2 - thickness + wing)),
         layer=CutLayer,
     )
 
-    w_wing_wall = Shape (
+    score1 = Shape(
         RelPoints([
-            (0, fold_margin),
-            (-internal_wing, 0),
-            (0, height - 2*fold_margin),
-            (internal_wing, 0),
-            (0, fold_margin),
-
-            (fold_margin, 0),
-            (0, height - thickness),
-            (2*fold_margin, wing),
-            ((width - 2*(thickness+3*fold_margin))/2, 0),  # <----
-        ], mirror=(1, -1)),
-        layer=CutLayer
+            (0, depth),
+        ]),
+        layer=ScoreLayer,
     )
 
     shapes.add_shape(bottom)
+    shapes.add_shape(outer_cut_left)
 
     w_wall.align_to(bottom, position='left-up', move=(thickness, 0))
     shapes.add_shape(w_wall)
@@ -66,19 +72,18 @@ def create_double_wall_box(box_dimensions):
     w_wall.align_to(bottom, position='left-down', move=(thickness, 0), scale=(1, -1))
     shapes.add_shape(w_wall)
 
-    dw1 = shapes.add_shape(d_wall)
-    dw2 = shapes.add_shape(d_wall.align_to(bottom, position='right-down', scale=(-1, 1)))
+    shapes.add_shape(outer_cut_left.create_internal_line(2, layer=ScoreLayer))
+    shapes.add_shape(outer_cut_left.create_internal_line(15, layer=ScoreLayer))
 
-    ww1 = shapes.add_shape(w_wing_wall.align_to(bottom, position='left-up', move=(thickness, 0)))
-    ww2 = shapes.add_shape(w_wing_wall.align_to(bottom, position='left-down', move=(thickness, 0), scale=(1, -1)))
+    score1.align_to(bottom, position='left-down', move=(-height, 0))
+    shapes.add_shape(score1)
+    score1.align_to(bottom, position='left-down', move=(-(2*height-thickness), 0))
+    shapes.add_shape(score1)
 
-    # Create internal score lines
-    for x in (dw1, dw2):
-        shapes.add_shape(x.create_internal_line(2, layer=ScoreLayer))
-        shapes.add_shape(x.create_internal_line(3, layer=ScoreLayer))
-
-    for x in (ww1, ww2):
-        shapes.add_shape(x.create_internal_line(7, layer=ScoreLayer))
+    score1.align_to(bottom, position='right-down', move=(height, 0))
+    shapes.add_shape(score1)
+    score1.align_to(bottom, position='right-down', move=((2*height-thickness), 0))
+    shapes.add_shape(score1)
 
     return shapes
 
@@ -102,9 +107,9 @@ def create_box_with_led(box_dimensions):
 
 
 if __name__ == '__main__':
-    dimensions = dict(height=40, width=50, depth=45, led_height=20, thickness=0.7, fold_margin=2, wing_width=10)
+    dimensions = dict(height=35, width=85, depth=35, led_height=20, thickness=0.7, fold_margin=2, wing_width=10)
     body, led = create_box_with_led(dimensions)
-    write_shapes_to_file('body.dxf', body)
-    write_shapes_to_file('led.dxf', led)
+    write_shapes_to_file('body2.dxf', body)
+    write_shapes_to_file('led2.dxf', led)
 
 
