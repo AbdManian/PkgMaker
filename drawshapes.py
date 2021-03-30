@@ -16,7 +16,7 @@ def drawshapes(shapes, model_space, layer_dict):
 
 
 def create_dxf_doc_modelspace():
-    doc = ezdxf.new(dxfversion='R2010', setup=True)
+    doc = ezdxf.new(dxfversion='R2010')
     doc.layers.new(name='CutLayer', dxfattribs={'color': 7})
     doc.layers.new(name='Score', dxfattribs={'color': 1})
 
